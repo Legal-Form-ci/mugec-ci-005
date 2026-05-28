@@ -16,6 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import {
   MoreHorizontal, Eye, Users, Wallet, FileCheck,
@@ -47,6 +48,7 @@ const PAGE = 50;
 const STATUTS = ["actif", "en_attente", "suspendu", "decede", "marie", "licencie", "assiste", "retraite"];
 
 function AdminDashboard() {
+  const { user, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [members, setMembers] = useState<MemberRow[]>([]);
   const [page, setPage] = useState(0);
@@ -108,8 +110,17 @@ function AdminDashboard() {
     setTrend(buckets.map(({ mois, inscriptions, cotisations }) => ({ mois, inscriptions, cotisations })));
   }
 
-  useEffect(() => { loadStats(); loadTrend(); }, []);
-  useEffect(() => { loadMembers(); /* eslint-disable-next-line */ }, [page]);
+  useEffect(() => {
+    if (authLoading || !user?.id) return;
+    loadStats();
+    loadTrend();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, authLoading]);
+  useEffect(() => {
+    if (authLoading || !user?.id) return;
+    loadMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, user?.id, authLoading]);
 
   async function setStatus(id: string, statut: string) {
     const { error } = await supabase.from("members").update({ statut }).eq("id", id);
