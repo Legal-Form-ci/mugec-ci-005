@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { FileCheck, Search, Wallet, CheckCircle2, AlertTriangle } from "lucide-react";
+import { FileCheck, Search, Wallet, CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/droits-adhesion")({ component: DroitsAdhesionPage });
 
@@ -159,5 +159,3 @@ function MiniStat({ icon, label, value, accent }: { icon: React.ReactNode; label
     </Card>
   );
 }
-
-const _: unknown = AlertTriangle;
