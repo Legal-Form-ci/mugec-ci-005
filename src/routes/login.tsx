@@ -76,7 +76,9 @@ function Page() {
           <CardContent className="p-8">
             <img src={logo} alt="MUGEC-CI" className="mx-auto h-16" />
             <h1 className="mt-4 text-center text-2xl font-bold">Espace membre</h1>
-            <p className="mt-1 text-center text-sm text-muted-foreground">Connectez-vous à votre compte MUGEC-CI</p>
+            <p className="mt-1 text-center text-sm text-muted-foreground">
+              Connectez-vous à votre compte MUGEC-CI
+            </p>
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               {errorMsg && (
                 <div
@@ -94,13 +96,18 @@ function Page() {
                   type="text"
                   required
                   value={identifier}
-                  onChange={(e) => { setIdentifier(e.target.value); if (errorMsg) setErrorMsg(null); }}
+                  onChange={(e) => {
+                    setIdentifier(e.target.value);
+                    if (errorMsg) setErrorMsg(null);
+                  }}
                   placeholder="Ex: 0759566087"
                   inputMode="tel"
                   pattern="[0-9]{6,}"
                   autoComplete="tel"
                   aria-invalid={errorMsg ? true : undefined}
-                  className={errorMsg ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  className={
+                    errorMsg ? "border-destructive focus-visible:ring-destructive" : undefined
+                  }
                 />
               </div>
               <div>
@@ -111,7 +118,10 @@ function Page() {
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
-                    onChange={(e) => { setPassword(e.target.value); if (errorMsg) setErrorMsg(null); }}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errorMsg) setErrorMsg(null);
+                    }}
                     className={`pr-10 ${errorMsg ? "border-destructive focus-visible:ring-destructive" : ""}`}
                     aria-invalid={errorMsg ? true : undefined}
                     autoComplete="current-password"
@@ -119,7 +129,9 @@ function Page() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    aria-label={
+                      showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"
+                    }
                     className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
                     tabIndex={-1}
                   >
@@ -132,7 +144,10 @@ function Page() {
               </Button>
             </form>
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              Pas encore membre ? <Link to="/inscription" className="text-primary underline">S'inscrire</Link>
+              Pas encore membre ?{" "}
+              <Link to="/inscription" className="text-primary underline">
+                S'inscrire
+              </Link>
             </p>
           </CardContent>
         </Card>
@@ -141,4 +156,3 @@ function Page() {
     </div>
   );
 }
-

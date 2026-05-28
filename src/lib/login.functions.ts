@@ -26,9 +26,12 @@ export const loginWithIdentifier = createServerFn({ method: "POST" })
       auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
     });
 
-    const { data: resolvedEmail, error: resolveError } = await authClient.rpc("resolve_login_email", {
-      p_identifier: identifier,
-    });
+    const { data: resolvedEmail, error: resolveError } = await authClient.rpc(
+      "resolve_login_email",
+      {
+        p_identifier: identifier,
+      },
+    );
     if (resolveError || typeof resolvedEmail !== "string" || resolvedEmail.length === 0) {
       return generic;
     }
