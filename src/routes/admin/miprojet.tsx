@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -87,8 +88,9 @@ function fmtFCFA(n: number | undefined | null) {
   return `${(n ?? 0).toLocaleString("fr-FR")} F`;
 }
 
-export function MiProjetDashboard() {
+function MiProjetDashboard() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [tx, setTx] = useState<Tx[]>([]);
@@ -99,10 +101,10 @@ export function MiProjetDashboard() {
 
   // Garde d'accès : seul super_admin peut accéder à ce back-office.
   useEffect(() => {
+    if (authLoading) return;
+    if (!user?.id) { navigate({ to: "/login" }); return; }
     let active = true;
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { navigate({ to: "/login" }); return; }
       const { data } = await supabase
         .from("user_roles")
         .select("role")
@@ -114,7 +116,7 @@ export function MiProjetDashboard() {
       setAuthorized(true);
     })();
     return () => { active = false; };
-  }, [navigate]);
+  }, [user?.id, authLoading, navigate]);
 
   useEffect(() => {
     if (!authorized) return;
