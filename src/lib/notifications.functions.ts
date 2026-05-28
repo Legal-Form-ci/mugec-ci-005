@@ -27,11 +27,17 @@ async function sendSms(to: string, body: string) {
   }
 }
 
-async function sendWhatsapp(to: string, body: string) {
+const BRAND_LOGO_URL = process.env.BRAND_LOGO_URL ?? "https://mugec-ci.ivoireprojet.com/mugec-logo.png";
+const BRAND_NAME = "MUGEC-CI";
+const BRAND_FOOTER = "MUGEC-CI · Mutuelle Générale des Collectivités de Côte d'Ivoire";
+
+async function sendWhatsapp(to: string, title: string, body: string) {
   const url = process.env.WHATSAPP_API_URL;
   const token = process.env.WHATSAPP_API_TOKEN;
   const from = process.env.WHATSAPP_SENDER_ID;
   if (!url || !token) return { ok: false, error: "WhatsApp provider not configured" };
+  // Format texte structuré + media header (logo) si supporté par le provider.
+  const text = `*${title}*\n\n${body}\n\n— ${BRAND_NAME}`;
   try {
     const res = await fetch(url, {
       method: "POST",
@@ -40,8 +46,10 @@ async function sendWhatsapp(to: string, body: string) {
         messaging_product: "whatsapp",
         to,
         from,
-        type: "text",
-        text: { body },
+        type: "image",
+        image: { link: BRAND_LOGO_URL, caption: text },
+        // Compat fallback : certains providers ignorent `image` et ne lisent que `text`.
+        text: { body: text },
       }),
     });
     return { ok: res.ok, status: res.status };
@@ -64,6 +72,25 @@ async function sendEmail(to: string, subject: string, body: string) {
   const key = process.env.EMAIL_API_KEY;
   const from = process.env.EMAIL_FROM ?? "no-reply@mugec-ci.ci";
   if (!url || !key) return { ok: false, error: "Email provider not configured" };
+  const safeBody = escapeHtml(body).replace(/\n/g, "<br/>");
+  const html = `<!doctype html><html><body style="margin:0;background:#f5f7fb;font-family:Inter,Arial,sans-serif;color:#0f172a">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fb;padding:24px 0">
+      <tr><td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.08)">
+          <tr><td style="background:linear-gradient(135deg,#0b5cad,#1f8a8b);padding:20px 28px" align="left">
+            <img src="${BRAND_LOGO_URL}" alt="${BRAND_NAME}" height="48" style="display:block;height:48px;border:0"/>
+          </td></tr>
+          <tr><td style="padding:28px">
+            <h1 style="margin:0 0 12px;font-size:20px;color:#0b5cad">${escapeHtml(subject)}</h1>
+            <div style="font-size:15px;line-height:1.6;color:#0f172a">${safeBody}</div>
+          </td></tr>
+          <tr><td style="padding:18px 28px;background:#f8fafc;color:#64748b;font-size:12px" align="center">
+            © ${new Date().getFullYear()} ${BRAND_FOOTER}
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body></html>`;
   try {
     const res = await fetch(url, {
       method: "POST",
@@ -71,9 +98,9 @@ async function sendEmail(to: string, subject: string, body: string) {
       body: JSON.stringify({
         from,
         to: [to],
-        subject: escapeHtml(subject),
+        subject,
         text: body,
-        html: `<pre style="font-family:Inter,Arial,sans-serif;white-space:pre-wrap">${escapeHtml(body)}</pre>`,
+        html,
       }),
     });
     return { ok: res.ok, status: res.status };
@@ -181,7 +208,7 @@ export const dispatchNotification = createServerFn({ method: "POST" })
 
       if (t.channel === "email" && to.email) outcome = await sendEmail(to.email, title, body);
       else if (t.channel === "sms" && to.phone) outcome = await sendSms(to.phone, body);
-      else if (t.channel === "whatsapp" && (to.whatsapp || to.phone)) outcome = await sendWhatsapp((to.whatsapp ?? to.phone)!, body);
+      else if (t.channel === "whatsapp" && (to.whatsapp || to.phone)) outcome = await sendWhatsapp((to.whatsapp ?? to.phone)!, title, body);
       else if (t.channel === "in_app" && userId) outcome = { ok: true };
 
       await supabaseAdmin.from("notifications_log").insert({
