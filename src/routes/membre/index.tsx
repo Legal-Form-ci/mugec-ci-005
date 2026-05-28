@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCurrentSupabaseUser } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
   Wallet,
@@ -60,47 +60,70 @@ type Subscription = {
 };
 
 function Page() {
+  const { user, loading: authLoading } = useAuth();
   const [member, setMember] = useState<Member | null>(null);
   const [subs, setSubs] = useState<Subscription[]>([]);
+  const [cotis, setCotis] = useState<{ id: string; montant: number; statut: string; periode: string | null; paye_le: string | null; created_at: string }[]>([]);
 
   useEffect(() => {
     let alive = true;
+    if (authLoading || !user?.id || !isSupabaseConfigured) return;
     (async () => {
-      if (!isSupabaseConfigured) return;
-      const currentUser = await getCurrentSupabaseUser();
-      if (!alive || !currentUser) return;
       const { data: m } = await supabase
         .from("members")
         .select("*")
-        .eq("user_id", currentUser.id)
+        .eq("user_id", user.id)
         .maybeSingle();
       if (!alive) return;
       if (m) setMember(m as Member);
       if (m?.id) {
-        const { data: s } = await supabase
-          .from("subscriptions")
-          .select("id, type, montant_total, statut_paiement, paid_at, created_at, periode")
-          .eq("member_id", m.id)
-          .order("created_at", { ascending: false })
-          .limit(50);
-        if (alive) setSubs((s as Subscription[]) ?? []);
+        const [{ data: s }, { data: c }] = await Promise.all([
+          supabase
+            .from("subscriptions")
+            .select("id, type, montant_total, statut_paiement, paid_at, created_at, periode")
+            .eq("member_id", m.id)
+            .order("created_at", { ascending: false })
+            .limit(50),
+          supabase
+            .from("cotisations")
+            .select("id, montant, statut, periode, paye_le, created_at")
+            .eq("member_id", m.id)
+            .order("created_at", { ascending: false })
+            .limit(50),
+        ]);
+        if (!alive) return;
+        setSubs((s as Subscription[]) ?? []);
+        setCotis((c as any[]) ?? []);
       }
     })();
     return () => {
       alive = false;
     };
-  }, []);
+  }, [user?.id, authLoading]);
 
   const m: Member = member ?? {};
   const initials = `${m.prenoms?.[0] ?? ""}${m.nom?.[0] ?? ""}`.toUpperCase() || "M";
 
   const stats = useMemo(() => {
-    const paid = subs.filter((s) => s.statut_paiement === "paye");
-    const total = paid.reduce((sum, s) => sum + (s.montant_total ?? 0), 0);
-    const pending = subs.filter((s) => s.statut_paiement !== "paye").length;
-    const lastPaid = paid[0]?.paid_at ?? paid[0]?.created_at ?? null;
-    return { total, pending, paidCount: paid.length, lastPaid };
-  }, [subs]);
+    const paidSubs = subs.filter((s) => s.statut_paiement === "paye");
+    const paidCotis = cotis.filter((c) => c.statut === "paye");
+    // Dédupe : si un même paiement remonte côté subs et côté cotisations,
+    // on prend le max pour éviter le double comptage.
+    const subsTotal = paidSubs.reduce((sum, s) => sum + (s.montant_total ?? 0), 0);
+    const cotiTotal = paidCotis.reduce((sum, c) => sum + (c.montant ?? 0), 0);
+    const total = Math.max(subsTotal, cotiTotal);
+    const paidCount = Math.max(paidSubs.length, paidCotis.length);
+    const pending =
+      subs.filter((s) => s.statut_paiement !== "paye").length +
+      cotis.filter((c) => c.statut !== "paye").length;
+    const lastPaid =
+      paidSubs[0]?.paid_at ??
+      paidSubs[0]?.created_at ??
+      paidCotis[0]?.paye_le ??
+      paidCotis[0]?.created_at ??
+      null;
+    return { total, pending, paidCount, lastPaid };
+  }, [subs, cotis]);
 
   const chartData = useMemo(() => {
     const map = new Map<string, number>();
