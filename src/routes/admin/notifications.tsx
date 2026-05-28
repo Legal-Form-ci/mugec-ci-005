@@ -210,18 +210,26 @@ function NotificationsPage() {
                       <TableHead>Événement</TableHead>
                       <TableHead>Canal</TableHead>
                       <TableHead>Titre</TableHead>
+                      <TableHead>Contenu</TableHead>
                       <TableHead>Actif</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tpls.length === 0 ? (
-                      <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">Aucun modèle</TableCell></TableRow>
+                    {loadingTpls ? (
+                      <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">Chargement…</TableCell></TableRow>
+                    ) : tpls.length === 0 ? (
+                      <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">Aucun modèle</TableCell></TableRow>
                     ) : tpls.map((t) => (
                       <TableRow key={t.id}>
                         <TableCell className="font-mono text-xs">{t.event}</TableCell>
                         <TableCell><Badge variant="outline" className="gap-1"><CanalIcon c={t.channel}/>{t.channel}</Badge></TableCell>
                         <TableCell>{t.title}</TableCell>
+                        <TableCell className="max-w-md truncate text-xs text-muted-foreground" title={t.body}>{t.body}</TableCell>
                         <TableCell><Switch checked={t.active} onCheckedChange={() => toggleTpl(t)}/></TableCell>
+                        <TableCell className="text-right">
+                          <Button size="sm" variant="outline" onClick={() => setPreview(t)}><Eye className="h-3.5 w-3.5 mr-1"/>Voir</Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -230,7 +238,62 @@ function NotificationsPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                {preview && <CanalIcon c={preview.channel}/>} {preview?.title}
+              </DialogTitle>
+              <DialogDescription>
+                Événement : <span className="font-mono">{preview?.event}</span> · Canal : {preview?.channel}
+              </DialogDescription>
+            </DialogHeader>
+            {preview?.channel === "email" ? (
+              <div className="rounded-lg border bg-muted/30 p-4">
+                <iframe
+                  title="Aperçu email"
+                  className="h-[420px] w-full rounded bg-white"
+                  srcDoc={renderEmailPreview(preview.title, preview.body)}
+                />
+              </div>
+            ) : preview?.channel === "whatsapp" ? (
+              <div className="rounded-lg bg-[#ECE5DD] p-4">
+                <div className="ml-auto max-w-md rounded-lg bg-[#DCF8C6] p-3 shadow text-sm whitespace-pre-wrap">
+                  <img src="/mugec-logo.png" alt="MUGEC-CI" className="mb-2 h-10 w-auto"/>
+                  <div className="font-semibold mb-1">{preview.title}</div>
+                  {preview.body}
+                </div>
+              </div>
+            ) : (
+              <pre className="whitespace-pre-wrap rounded-lg border bg-muted/30 p-4 text-sm">{preview?.body}</pre>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
+}
+
+function renderEmailPreview(title: string, body: string) {
+  const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const safeBody = esc(body).replace(/\n/g, "<br/>");
+  return `<!doctype html><html><body style="margin:0;background:#f5f7fb;font-family:Inter,Arial,sans-serif;color:#0f172a">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fb;padding:24px 0">
+      <tr><td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.08)">
+          <tr><td style="background:linear-gradient(135deg,#0b5cad,#1f8a8b);padding:20px 28px" align="left">
+            <img src="/mugec-logo.png" alt="MUGEC-CI" height="48" style="display:block;height:48px"/>
+          </td></tr>
+          <tr><td style="padding:28px">
+            <h1 style="margin:0 0 12px;font-size:20px;color:#0b5cad">${esc(title)}</h1>
+            <div style="font-size:15px;line-height:1.6">${safeBody}</div>
+          </td></tr>
+          <tr><td style="padding:18px 28px;background:#f8fafc;color:#64748b;font-size:12px" align="center">
+            © ${new Date().getFullYear()} MUGEC-CI · Mutuelle Générale des Collectivités de Côte d'Ivoire
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body></html>`;
 }
