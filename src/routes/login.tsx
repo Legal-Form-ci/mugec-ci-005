@@ -52,7 +52,7 @@ function Page() {
       }
       // dashboard_path is computed server-side inside loginWithIdentifier
       // from this user's roles — no race condition possible.
-      const target = "/membre";
+      const target = res.dashboard_path;
       const { data: verified } = await supabase.auth.getUser();
       if (!verified.user) {
         setErrorMsg("Session non reconnue, veuillez réessayer.");
