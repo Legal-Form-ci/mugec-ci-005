@@ -35,6 +35,7 @@ import { Route as AdminPrestationsRouteImport } from './routes/admin/prestations
 import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
 import { Route as AdminMiprojetRouteImport } from './routes/admin/miprojet'
 import { Route as AdminMembresRouteImport } from './routes/admin/membres'
+import { Route as AdminDroitsAdhesionRouteImport } from './routes/admin/droits-adhesion'
 import { Route as AdminCotisationsRouteImport } from './routes/admin/cotisations'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -167,6 +168,11 @@ const AdminMembresRoute = AdminMembresRouteImport.update({
   path: '/membres',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDroitsAdhesionRoute = AdminDroitsAdhesionRouteImport.update({
+  id: '/droits-adhesion',
+  path: '/droits-adhesion',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCotisationsRoute = AdminCotisationsRouteImport.update({
   id: '/cotisations',
   path: '/cotisations',
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
+  '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
   '/admin/miprojet': typeof AdminMiprojetRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
+  '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
   '/admin/miprojet': typeof AdminMiprojetRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
+  '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
   '/admin/miprojet': typeof AdminMiprojetRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -277,6 +286,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/sitemap.xml'
     | '/admin/cotisations'
+    | '/admin/droits-adhesion'
     | '/admin/membres'
     | '/admin/miprojet'
     | '/admin/notifications'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/sitemap.xml'
     | '/admin/cotisations'
+    | '/admin/droits-adhesion'
     | '/admin/membres'
     | '/admin/miprojet'
     | '/admin/notifications'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/sitemap.xml'
     | '/admin/cotisations'
+    | '/admin/droits-adhesion'
     | '/admin/membres'
     | '/admin/miprojet'
     | '/admin/notifications'
@@ -549,6 +561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMembresRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/droits-adhesion': {
+      id: '/admin/droits-adhesion'
+      path: '/droits-adhesion'
+      fullPath: '/admin/droits-adhesion'
+      preLoaderRoute: typeof AdminDroitsAdhesionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/cotisations': {
       id: '/admin/cotisations'
       path: '/cotisations'
@@ -561,6 +580,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCotisationsRoute: typeof AdminCotisationsRoute
+  AdminDroitsAdhesionRoute: typeof AdminDroitsAdhesionRoute
   AdminMembresRoute: typeof AdminMembresRoute
   AdminMiprojetRoute: typeof AdminMiprojetRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
@@ -570,6 +590,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCotisationsRoute: AdminCotisationsRoute,
+  AdminDroitsAdhesionRoute: AdminDroitsAdhesionRoute,
   AdminMembresRoute: AdminMembresRoute,
   AdminMiprojetRoute: AdminMiprojetRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,

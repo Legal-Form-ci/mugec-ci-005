@@ -17,9 +17,10 @@ import { Wallet, Search, Send, MessageSquare, AlertTriangle, CheckCircle2 } from
 export const Route = createFileRoute("/admin/cotisations")({ component: CotisationsPage });
 
 type Row = {
-  id: string; member_id: string; periode: string; montant: number;
-  statut: string; methode: string | null; reference: string | null;
-  paye_le: string | null; created_at: string;
+  id: string; member_id: string; periode: string | null;
+  montant_total: number; part_mutuelle: number; part_miprojet: number;
+  statut_paiement: string; operateur: string | null; reference_transaction: string | null;
+  paid_at: string | null; created_at: string;
   members?: { nom: string; prenoms: string; telephone: string | null; matricule: string | null; user_id: string } | null;
 };
 
@@ -38,11 +39,13 @@ function CotisationsPage() {
   async function load() {
     setLoading(true);
     let qb = supabase
-      .from("cotisations")
-      .select("id, member_id, periode, montant, statut, methode, reference, paye_le, created_at, members:member_id (nom, prenoms, telephone, matricule, user_id)")
+      .from("subscriptions")
+      .select("id, member_id, periode, montant_total, part_mutuelle, part_miprojet, statut_paiement, operateur, reference_transaction, paid_at, created_at, members:member_id (nom, prenoms, telephone, matricule, user_id)")
+      .eq("type", "cotisation")
       .order("created_at", { ascending: false })
       .range(page * PAGE, page * PAGE + PAGE - 1);
-    if (statut !== "all" && statut !== "en_retard") qb = qb.eq("statut", statut);
+    if (statut === "paye") qb = qb.eq("statut_paiement", "paye");
+    else if (statut === "en_attente") qb = qb.eq("statut_paiement", "en_attente");
     const { data, error } = await qb;
     if (error) toast.error(error.message);
     else setRows((data as any) || []);
@@ -55,11 +58,11 @@ function CotisationsPage() {
     let r = rows;
     if (statut === "en_retard") {
       const lim = new Date(); lim.setDate(lim.getDate() - 30);
-      r = r.filter((x) => x.statut !== "paye" && new Date(x.created_at) < lim);
+      r = r.filter((x) => x.statut_paiement !== "paye" && new Date(x.created_at) < lim);
     }
     if (!s) return r;
     return r.filter((x) =>
-      (x.reference ?? "").toLowerCase().includes(s) ||
+      (x.reference_transaction ?? "").toLowerCase().includes(s) ||
       (x.periode ?? "").toLowerCase().includes(s) ||
       (x.members?.nom ?? "").toLowerCase().includes(s) ||
       (x.members?.matricule ?? "").toLowerCase().includes(s),
@@ -67,7 +70,7 @@ function CotisationsPage() {
   }, [rows, q, statut]);
 
   async function markPaid(id: string) {
-    const { error } = await supabase.from("cotisations").update({ statut: "paye", paye_le: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase.from("subscriptions").update({ statut_paiement: "paye", paid_at: new Date().toISOString() }).eq("id", id);
     if (error) toast.error(error.message);
     else { toast.success("Marqué payé"); load(); }
   }
@@ -85,8 +88,8 @@ function CotisationsPage() {
           context: {
             nom: r.members.nom,
             prenoms: r.members.prenoms,
-            periode: r.periode,
-            montant: r.montant,
+            periode: r.periode ?? "",
+            montant: r.part_mutuelle,
             matricule: r.members.matricule ?? "",
           },
         },
@@ -98,7 +101,7 @@ function CotisationsPage() {
   }
 
   async function relanceMass(channels: ("sms"|"whatsapp"|"email")[]) {
-    const cibles = filtered.filter((r) => r.statut !== "paye");
+    const cibles = filtered.filter((r) => r.statut_paiement !== "paye");
     if (cibles.length === 0) { toast.info("Aucune cotisation à relancer"); return; }
     toast.message(`Envoi de ${cibles.length} relance(s)…`);
     let ok = 0;
@@ -109,11 +112,11 @@ function CotisationsPage() {
   }
 
   const stats = useMemo(() => {
-    const paye = filtered.filter((r) => r.statut === "paye").reduce((a, b) => a + (b.montant || 0), 0);
-    const attente = filtered.filter((r) => r.statut !== "paye").reduce((a, b) => a + (b.montant || 0), 0);
+    const paye = filtered.filter((r) => r.statut_paiement === "paye").reduce((a, b) => a + (b.part_mutuelle || 0), 0);
+    const attente = filtered.filter((r) => r.statut_paiement !== "paye").reduce((a, b) => a + (b.part_mutuelle || 0), 0);
     const retard = filtered.filter((r) => {
       const lim = new Date(); lim.setDate(lim.getDate() - 30);
-      return r.statut !== "paye" && new Date(r.created_at) < lim;
+      return r.statut_paiement !== "paye" && new Date(r.created_at) < lim;
     }).length;
     return { paye, attente, retard, total: filtered.length };
   }, [filtered]);
@@ -166,7 +169,7 @@ function CotisationsPage() {
                     <TableRow>
                       <TableHead>Membre</TableHead>
                       <TableHead>Période</TableHead>
-                      <TableHead className="text-right">Montant</TableHead>
+                      <TableHead className="text-right">Part MUGEC-CI</TableHead>
                       <TableHead>Statut</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
@@ -183,17 +186,17 @@ function CotisationsPage() {
                           {r.members ? `${r.members.nom} ${r.members.prenoms}` : "—"}
                           {r.members?.matricule && <div className="font-mono text-xs text-muted-foreground">{r.members.matricule}</div>}
                         </TableCell>
-                        <TableCell>{r.periode}</TableCell>
-                        <TableCell className="text-right font-mono">{fmt(r.montant)}</TableCell>
+                        <TableCell>{r.periode ?? "—"}</TableCell>
+                        <TableCell className="text-right font-mono">{fmt(r.part_mutuelle)}</TableCell>
                         <TableCell>
-                          {r.statut === "paye"
+                          {r.statut_paiement === "paye"
                             ? <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/20">Payée</Badge>
-                            : <Badge variant="secondary">{r.statut.replace("_"," ")}</Badge>}
+                            : <Badge variant="secondary">{r.statut_paiement.replace("_"," ")}</Badge>}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("fr-FR")}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
-                            {r.statut !== "paye" && (
+                            {r.statut_paiement !== "paye" && (
                               <>
                                 <Button size="sm" variant="outline" onClick={() => relancer(r, ["sms"])}><Send className="h-3.5 w-3.5 mr-1"/>SMS</Button>
                                 <Button size="sm" variant="outline" onClick={() => relancer(r, ["whatsapp"])}><MessageSquare className="h-3.5 w-3.5 mr-1"/>WA</Button>
