@@ -79,6 +79,7 @@ function AdminGate() {
         refresh_token: res.refresh_token,
       });
       if (sessionError) throw sessionError;
+      setState("ready");
       navigate({ to: res.dashboard_path, replace: true });
     } catch {
       setError("Identifiant ou mot de passe admin MUGEC-CI incorrect.");
