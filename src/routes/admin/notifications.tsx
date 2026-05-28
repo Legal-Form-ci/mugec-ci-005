@@ -137,7 +137,9 @@ function NotificationsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered.length === 0 ? (
+                    {loadingLogs ? (
+                      <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">Chargement…</TableCell></TableRow>
+                    ) : filtered.length === 0 ? (
                       <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">Aucune notification</TableCell></TableRow>
                     ) : filtered.map((l) => (
                       <TableRow key={l.id}>
