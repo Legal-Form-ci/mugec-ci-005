@@ -176,7 +176,7 @@ export const ADMIN_NAV: NavItem[] = [
     label: "Finances",
     children: [
       { to: "/admin/cotisations", label: "Cotisations" },
-      { to: "/admin/cotisations", label: "Droits d'adhésion" },
+      { to: "/admin/droits-adhesion", label: "Droits d'adhésion" },
     ],
   },
   { to: "/admin/prestations", label: "Prestations" },
@@ -184,6 +184,7 @@ export const ADMIN_NAV: NavItem[] = [
     label: "Communication",
     children: [
       { to: "/admin/notifications", label: "Notifications" },
+      { to: "/admin/modeles", label: "Modèles" },
     ],
   },
 ];
