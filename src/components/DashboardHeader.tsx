@@ -184,7 +184,6 @@ export const ADMIN_NAV: NavItem[] = [
     label: "Communication",
     children: [
       { to: "/admin/notifications", label: "Notifications" },
-      { to: "/admin/modeles", label: "Modèles" },
     ],
   },
 ];
