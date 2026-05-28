@@ -11,9 +11,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { Bell, Mail, MessageSquare, Send, Plus, Search } from "lucide-react";
+import { Bell, Mail, MessageSquare, Send, Plus, Search, Eye } from "lucide-react";
 
 export const Route = createFileRoute("/admin/notifications")({ component: NotificationsPage });
 
@@ -40,25 +41,34 @@ function NotificationsPage() {
   const [canal, setCanal] = useState<string>("all");
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState<Partial<Tpl>>({ event: "", channel: "email", title: "", body: "", active: true });
+  const [loadingLogs, setLoadingLogs] = useState(true);
+  const [loadingTpls, setLoadingTpls] = useState(true);
+  const [preview, setPreview] = useState<Tpl | null>(null);
 
   async function loadLogs() {
+    setLoadingLogs(true);
     let qb = supabase
       .from("notifications_log")
       .select("id, canal, event, contenu, statut, created_at, sent_at, error_message")
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(100);
     if (canal !== "all") qb = qb.eq("canal", canal);
     const { data, error } = await qb;
     if (error) toast.error(error.message); else setLogs((data as any) || []);
+    setLoadingLogs(false);
   }
   async function loadTpls() {
+    setLoadingTpls(true);
     const { data, error } = await supabase
       .from("notification_templates")
       .select("*")
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message); else setTpls((data as any) || []);
+    setLoadingTpls(false);
   }
-  useEffect(() => { loadLogs(); loadTpls(); /* eslint-disable-next-line */ }, [canal]);
+  // Charge logs et templates en parallèle au montage; recharge seulement les logs sur changement de canal.
+  useEffect(() => { loadTpls(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { loadLogs(); /* eslint-disable-next-line */ }, [canal]);
 
   const filtered = logs.filter((l) => {
     const s = q.trim().toLowerCase();
