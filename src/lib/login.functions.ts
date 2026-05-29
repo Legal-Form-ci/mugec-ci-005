@@ -20,8 +20,18 @@ export const loginWithIdentifier = createServerFn({ method: "POST" })
     const generic = { ok: false as const, error: "invalid_credentials" };
     const identifier = data.identifier.trim().toLowerCase();
 
-    const SUPABASE_URL = process.env.SUPABASE_URL!;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    // Fallback to VITE_* (inlined by Vite at build time) so the login works
+    // even when the hosting platform (Vercel, etc.) does not expose the
+    // unprefixed SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY at runtime.
+    const SUPABASE_URL =
+      process.env.SUPABASE_URL ?? import.meta.env.VITE_SUPABASE_URL;
+    const SUPABASE_PUBLISHABLE_KEY =
+      process.env.SUPABASE_PUBLISHABLE_KEY ??
+      import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+      console.error("[login] Missing Supabase server env vars");
+      return generic;
+    }
     const authClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
     });
