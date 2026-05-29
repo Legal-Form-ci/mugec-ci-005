@@ -3,6 +3,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+// Les nouvelles colonnes (slug, summary, illustrations, …) n'existent pas
+// encore dans le types.ts généré : on utilise un proxy non typé pour ces
+// écritures avant régénération.
+const db: any = supabaseAdmin;
+
 const ADMIN_ROLES = new Set([
   "super_admin", "admin_national", "admin_regional", "admin_local", "agent_saisie",
   "president", "secretaire_general", "tresorier_national", "commissaire_comptes",
@@ -190,11 +195,11 @@ export const upsertNews = createServerFn({ method: "POST" })
       author_id: context.userId,
     };
     if (data.id) {
-      const { error } = await supabaseAdmin.from("news").update(payload).eq("id", data.id);
+      const { error } = await db.from("news").update(payload).eq("id", data.id);
       if (error) throw new Error(error.message);
       return { ok: true, id: data.id };
     }
-    const { data: row, error } = await supabaseAdmin.from("news").insert(payload).select("id").single();
+    const { data: row, error } = await db.from("news").insert(payload).select("id").single();
     if (error) throw new Error(error.message);
     return { ok: true, id: row.id };
   });
@@ -241,11 +246,11 @@ export const upsertOpportunite = createServerFn({ method: "POST" })
       published: data.published,
     };
     if (data.id) {
-      const { error } = await supabaseAdmin.from("opportunites").update(payload).eq("id", data.id);
+      const { error } = await db.from("opportunites").update(payload).eq("id", data.id);
       if (error) throw new Error(error.message);
       return { ok: true, id: data.id };
     }
-    const { data: row, error } = await supabaseAdmin.from("opportunites").insert(payload).select("id").single();
+    const { data: row, error } = await db.from("opportunites").insert(payload).select("id").single();
     if (error) throw new Error(error.message);
     return { ok: true, id: row.id };
   });
@@ -260,7 +265,7 @@ export const deleteContent = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
-    const { error } = await supabaseAdmin.from(data.kind).delete().eq("id", data.id);
+    const { error } = await db.from(data.kind).delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

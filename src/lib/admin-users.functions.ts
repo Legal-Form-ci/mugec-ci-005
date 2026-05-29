@@ -119,8 +119,8 @@ export const createAdminUser = createServerFn({ method: "POST" })
       { onConflict: "user_id,role", ignoreDuplicates: true },
     );
 
-    // journal invitation
-    await supabaseAdmin.from("admin_invitations").insert({
+    // journal invitation (table créée via migration ; cast pour contourner types générés)
+    await (supabaseAdmin as any).from("admin_invitations").insert({
       target_user_id: userId,
       target_email: data.email,
       target_phone: data.phone || null,
