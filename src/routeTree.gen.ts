@@ -26,17 +26,20 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as MembreIndexRouteImport } from './routes/membre/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as VerifierMatriculeRouteImport } from './routes/verifier.$matricule'
+import { Route as MiprojetUtilisateursRouteImport } from './routes/miprojet.utilisateurs'
 import { Route as MembreProfilRouteImport } from './routes/membre/profil'
 import { Route as MembreFicheRouteImport } from './routes/membre/fiche'
 import { Route as MembreDocumentsRouteImport } from './routes/membre/documents'
 import { Route as MembreCotisationsRouteImport } from './routes/membre/cotisations'
 import { Route as MembreCarteRouteImport } from './routes/membre/carte'
 import { Route as AdminPrestationsRouteImport } from './routes/admin/prestations'
+import { Route as AdminOpportunitesRouteImport } from './routes/admin/opportunites'
 import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
 import { Route as AdminMiprojetRouteImport } from './routes/admin/miprojet'
 import { Route as AdminMembresRouteImport } from './routes/admin/membres'
 import { Route as AdminDroitsAdhesionRouteImport } from './routes/admin/droits-adhesion'
 import { Route as AdminCotisationsRouteImport } from './routes/admin/cotisations'
+import { Route as AdminActualitesRouteImport } from './routes/admin/actualites'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -123,6 +126,11 @@ const VerifierMatriculeRoute = VerifierMatriculeRouteImport.update({
   path: '/verifier/$matricule',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MiprojetUtilisateursRoute = MiprojetUtilisateursRouteImport.update({
+  id: '/utilisateurs',
+  path: '/utilisateurs',
+  getParentRoute: () => MiprojetRoute,
+} as any)
 const MembreProfilRoute = MembreProfilRouteImport.update({
   id: '/profil',
   path: '/profil',
@@ -153,6 +161,11 @@ const AdminPrestationsRoute = AdminPrestationsRouteImport.update({
   path: '/prestations',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminOpportunitesRoute = AdminOpportunitesRouteImport.update({
+  id: '/opportunites',
+  path: '/opportunites',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -178,6 +191,11 @@ const AdminCotisationsRoute = AdminCotisationsRouteImport.update({
   path: '/cotisations',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminActualitesRoute = AdminActualitesRouteImport.update({
+  id: '/actualites',
+  path: '/actualites',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -189,22 +207,25 @@ export interface FileRoutesByFullPath {
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
   '/membre': typeof MembreRouteWithChildren
-  '/miprojet': typeof MiprojetRoute
+  '/miprojet': typeof MiprojetRouteWithChildren
   '/opportunites': typeof OpportunitesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/actualites': typeof AdminActualitesRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
   '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
   '/admin/miprojet': typeof AdminMiprojetRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/opportunites': typeof AdminOpportunitesRoute
   '/admin/prestations': typeof AdminPrestationsRoute
   '/membre/carte': typeof MembreCarteRoute
   '/membre/cotisations': typeof MembreCotisationsRoute
   '/membre/documents': typeof MembreDocumentsRoute
   '/membre/fiche': typeof MembreFicheRoute
   '/membre/profil': typeof MembreProfilRoute
+  '/miprojet/utilisateurs': typeof MiprojetUtilisateursRoute
   '/verifier/$matricule': typeof VerifierMatriculeRoute
   '/admin/': typeof AdminIndexRoute
   '/membre/': typeof MembreIndexRoute
@@ -217,22 +238,25 @@ export interface FileRoutesByTo {
   '/forum': typeof ForumRoute
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
-  '/miprojet': typeof MiprojetRoute
+  '/miprojet': typeof MiprojetRouteWithChildren
   '/opportunites': typeof OpportunitesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/actualites': typeof AdminActualitesRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
   '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
   '/admin/miprojet': typeof AdminMiprojetRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/opportunites': typeof AdminOpportunitesRoute
   '/admin/prestations': typeof AdminPrestationsRoute
   '/membre/carte': typeof MembreCarteRoute
   '/membre/cotisations': typeof MembreCotisationsRoute
   '/membre/documents': typeof MembreDocumentsRoute
   '/membre/fiche': typeof MembreFicheRoute
   '/membre/profil': typeof MembreProfilRoute
+  '/miprojet/utilisateurs': typeof MiprojetUtilisateursRoute
   '/verifier/$matricule': typeof VerifierMatriculeRoute
   '/admin': typeof AdminIndexRoute
   '/membre': typeof MembreIndexRoute
@@ -248,22 +272,25 @@ export interface FileRoutesById {
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
   '/membre': typeof MembreRouteWithChildren
-  '/miprojet': typeof MiprojetRoute
+  '/miprojet': typeof MiprojetRouteWithChildren
   '/opportunites': typeof OpportunitesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/actualites': typeof AdminActualitesRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
   '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
   '/admin/miprojet': typeof AdminMiprojetRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/opportunites': typeof AdminOpportunitesRoute
   '/admin/prestations': typeof AdminPrestationsRoute
   '/membre/carte': typeof MembreCarteRoute
   '/membre/cotisations': typeof MembreCotisationsRoute
   '/membre/documents': typeof MembreDocumentsRoute
   '/membre/fiche': typeof MembreFicheRoute
   '/membre/profil': typeof MembreProfilRoute
+  '/miprojet/utilisateurs': typeof MiprojetUtilisateursRoute
   '/verifier/$matricule': typeof VerifierMatriculeRoute
   '/admin/': typeof AdminIndexRoute
   '/membre/': typeof MembreIndexRoute
@@ -285,17 +312,20 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scanner'
     | '/sitemap.xml'
+    | '/admin/actualites'
     | '/admin/cotisations'
     | '/admin/droits-adhesion'
     | '/admin/membres'
     | '/admin/miprojet'
     | '/admin/notifications'
+    | '/admin/opportunites'
     | '/admin/prestations'
     | '/membre/carte'
     | '/membre/cotisations'
     | '/membre/documents'
     | '/membre/fiche'
     | '/membre/profil'
+    | '/miprojet/utilisateurs'
     | '/verifier/$matricule'
     | '/admin/'
     | '/membre/'
@@ -313,17 +343,20 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scanner'
     | '/sitemap.xml'
+    | '/admin/actualites'
     | '/admin/cotisations'
     | '/admin/droits-adhesion'
     | '/admin/membres'
     | '/admin/miprojet'
     | '/admin/notifications'
+    | '/admin/opportunites'
     | '/admin/prestations'
     | '/membre/carte'
     | '/membre/cotisations'
     | '/membre/documents'
     | '/membre/fiche'
     | '/membre/profil'
+    | '/miprojet/utilisateurs'
     | '/verifier/$matricule'
     | '/admin'
     | '/membre'
@@ -343,17 +376,20 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scanner'
     | '/sitemap.xml'
+    | '/admin/actualites'
     | '/admin/cotisations'
     | '/admin/droits-adhesion'
     | '/admin/membres'
     | '/admin/miprojet'
     | '/admin/notifications'
+    | '/admin/opportunites'
     | '/admin/prestations'
     | '/membre/carte'
     | '/membre/cotisations'
     | '/membre/documents'
     | '/membre/fiche'
     | '/membre/profil'
+    | '/miprojet/utilisateurs'
     | '/verifier/$matricule'
     | '/admin/'
     | '/membre/'
@@ -369,7 +405,7 @@ export interface RootRouteChildren {
   InscriptionRoute: typeof InscriptionRoute
   LoginRoute: typeof LoginRoute
   MembreRoute: typeof MembreRouteWithChildren
-  MiprojetRoute: typeof MiprojetRoute
+  MiprojetRoute: typeof MiprojetRouteWithChildren
   OpportunitesRoute: typeof OpportunitesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ScannerRoute: typeof ScannerRoute
@@ -498,6 +534,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifierMatriculeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/miprojet/utilisateurs': {
+      id: '/miprojet/utilisateurs'
+      path: '/utilisateurs'
+      fullPath: '/miprojet/utilisateurs'
+      preLoaderRoute: typeof MiprojetUtilisateursRouteImport
+      parentRoute: typeof MiprojetRoute
+    }
     '/membre/profil': {
       id: '/membre/profil'
       path: '/profil'
@@ -540,6 +583,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPrestationsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/opportunites': {
+      id: '/admin/opportunites'
+      path: '/opportunites'
+      fullPath: '/admin/opportunites'
+      preLoaderRoute: typeof AdminOpportunitesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/notifications': {
       id: '/admin/notifications'
       path: '/notifications'
@@ -575,25 +625,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCotisationsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/actualites': {
+      id: '/admin/actualites'
+      path: '/actualites'
+      fullPath: '/admin/actualites'
+      preLoaderRoute: typeof AdminActualitesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminActualitesRoute: typeof AdminActualitesRoute
   AdminCotisationsRoute: typeof AdminCotisationsRoute
   AdminDroitsAdhesionRoute: typeof AdminDroitsAdhesionRoute
   AdminMembresRoute: typeof AdminMembresRoute
   AdminMiprojetRoute: typeof AdminMiprojetRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminOpportunitesRoute: typeof AdminOpportunitesRoute
   AdminPrestationsRoute: typeof AdminPrestationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminActualitesRoute: AdminActualitesRoute,
   AdminCotisationsRoute: AdminCotisationsRoute,
   AdminDroitsAdhesionRoute: AdminDroitsAdhesionRoute,
   AdminMembresRoute: AdminMembresRoute,
   AdminMiprojetRoute: AdminMiprojetRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminOpportunitesRoute: AdminOpportunitesRoute,
   AdminPrestationsRoute: AdminPrestationsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -621,6 +682,18 @@ const MembreRouteChildren: MembreRouteChildren = {
 const MembreRouteWithChildren =
   MembreRoute._addFileChildren(MembreRouteChildren)
 
+interface MiprojetRouteChildren {
+  MiprojetUtilisateursRoute: typeof MiprojetUtilisateursRoute
+}
+
+const MiprojetRouteChildren: MiprojetRouteChildren = {
+  MiprojetUtilisateursRoute: MiprojetUtilisateursRoute,
+}
+
+const MiprojetRouteWithChildren = MiprojetRoute._addFileChildren(
+  MiprojetRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActualitesRoute: ActualitesRoute,
@@ -631,7 +704,7 @@ const rootRouteChildren: RootRouteChildren = {
   InscriptionRoute: InscriptionRoute,
   LoginRoute: LoginRoute,
   MembreRoute: MembreRouteWithChildren,
-  MiprojetRoute: MiprojetRoute,
+  MiprojetRoute: MiprojetRouteWithChildren,
   OpportunitesRoute: OpportunitesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ScannerRoute: ScannerRoute,

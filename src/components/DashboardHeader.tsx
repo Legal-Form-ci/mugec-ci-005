@@ -8,7 +8,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
   DropdownMenuLabel, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Home, Menu, ChevronDown } from "lucide-react";
+import { LogOut, Home, Menu, ChevronDown, ArrowLeftRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -27,6 +27,7 @@ export function DashboardHeader({
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [me, setMe] = useState<{ photo_url: string | null; nom: string | null; prenoms: string | null } | null>(null);
+  const [isSuper, setIsSuper] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { setOpen(false); }, [loc.pathname]);
@@ -39,6 +40,9 @@ export function DashboardHeader({
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => { if (active) setMe(data as any); });
+    supabase
+      .from("user_roles").select("role").eq("user_id", user.id).eq("role", "super_admin").maybeSingle()
+      .then(({ data }) => { if (active) setIsSuper(!!data); });
     return () => { active = false; };
   }, [user?.id]);
 
@@ -107,6 +111,14 @@ export function DashboardHeader({
           })}
         </nav>
         <div className="flex items-center gap-2">
+          {isSuper && (
+            <Button asChild variant="outline" size="sm" className="hidden md:inline-flex" title="Basculer entre portails">
+              <Link to={loc.pathname.startsWith("/miprojet") ? "/admin" : "/miprojet"}>
+                <ArrowLeftRight className="mr-2 h-4 w-4"/>
+                {loc.pathname.startsWith("/miprojet") ? "MUGEC-CI" : "MIPROJET"}
+              </Link>
+            </Button>
+          )}
           <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
             <Link to="/"><Home className="mr-2 h-4 w-4" /> Site public</Link>
           </Button>
@@ -181,6 +193,13 @@ export const ADMIN_NAV: NavItem[] = [
   },
   { to: "/admin/prestations", label: "Prestations" },
   {
+    label: "Contenus",
+    children: [
+      { to: "/admin/actualites", label: "Actualités" },
+      { to: "/admin/opportunites", label: "Opportunités" },
+    ],
+  },
+  {
     label: "Communication",
     children: [
       { to: "/admin/notifications", label: "Notifications" },
@@ -192,4 +211,5 @@ export const ADMIN_NAV: NavItem[] = [
 // NE JAMAIS importer dans l'espace MUGEC-CI.
 export const MIPROJET_NAV: NavItem[] = [
   { to: "/miprojet", label: "Tableau de bord" },
+  { to: "/miprojet/utilisateurs", label: "Utilisateurs" },
 ];
