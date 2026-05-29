@@ -37,6 +37,7 @@ import { Route as AdminMiprojetRouteImport } from './routes/admin/miprojet'
 import { Route as AdminMembresRouteImport } from './routes/admin/membres'
 import { Route as AdminDroitsAdhesionRouteImport } from './routes/admin/droits-adhesion'
 import { Route as AdminCotisationsRouteImport } from './routes/admin/cotisations'
+import { Route as AdminActualitesRouteImport } from './routes/admin/actualites'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -178,6 +179,11 @@ const AdminCotisationsRoute = AdminCotisationsRouteImport.update({
   path: '/cotisations',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminActualitesRoute = AdminActualitesRouteImport.update({
+  id: '/actualites',
+  path: '/actualites',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/actualites': typeof AdminActualitesRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
   '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/actualites': typeof AdminActualitesRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
   '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/actualites': typeof AdminActualitesRoute
   '/admin/cotisations': typeof AdminCotisationsRoute
   '/admin/droits-adhesion': typeof AdminDroitsAdhesionRoute
   '/admin/membres': typeof AdminMembresRoute
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scanner'
     | '/sitemap.xml'
+    | '/admin/actualites'
     | '/admin/cotisations'
     | '/admin/droits-adhesion'
     | '/admin/membres'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scanner'
     | '/sitemap.xml'
+    | '/admin/actualites'
     | '/admin/cotisations'
     | '/admin/droits-adhesion'
     | '/admin/membres'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scanner'
     | '/sitemap.xml'
+    | '/admin/actualites'
     | '/admin/cotisations'
     | '/admin/droits-adhesion'
     | '/admin/membres'
@@ -575,10 +587,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCotisationsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/actualites': {
+      id: '/admin/actualites'
+      path: '/actualites'
+      fullPath: '/admin/actualites'
+      preLoaderRoute: typeof AdminActualitesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminActualitesRoute: typeof AdminActualitesRoute
   AdminCotisationsRoute: typeof AdminCotisationsRoute
   AdminDroitsAdhesionRoute: typeof AdminDroitsAdhesionRoute
   AdminMembresRoute: typeof AdminMembresRoute
@@ -589,6 +609,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminActualitesRoute: AdminActualitesRoute,
   AdminCotisationsRoute: AdminCotisationsRoute,
   AdminDroitsAdhesionRoute: AdminDroitsAdhesionRoute,
   AdminMembresRoute: AdminMembresRoute,
