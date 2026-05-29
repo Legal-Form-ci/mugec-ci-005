@@ -136,7 +136,9 @@ function CotisationsPage() {
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="flex items-center gap-2"><Wallet className="h-5 w-5 text-primary"/> Suivi des cotisations</CardTitle>
-              <CardDescription>Marquage des paiements, relances SMS / WhatsApp / Email</CardDescription>
+              <CardDescription>
+                2 000 F par membre · 1 800 F mutuelle + 200 F MIPROJET · Marquage des paiements, relances SMS / WhatsApp / Email
+              </CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
               <div className="relative">
